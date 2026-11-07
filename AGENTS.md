@@ -53,7 +53,7 @@ Windows, `source .venv/bin/activate` elsewhere), so `python` is the venv's.
 ## Ownership (two people, two agents)
 
 - **strategy** (itsdanielyc, Claude Code): `model.py`, `equity.py`,
-  `tests/test_strategy.py`. Works on `main`; pushes only when
+  `preflop_table.py`, `tests/test_strategy.py`. Works on `main`; pushes only when
   `tests/test_model.py` passes, so `main` is always submittable.
 - **opponents** (cedriccollab-web, Codex): `opponent.py`, `sparring.py`,
   `tests/test_opponent.py`, `bots/`. Works on branch `opponents`; strategy
