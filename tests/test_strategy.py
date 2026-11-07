@@ -114,3 +114,34 @@ def test_equity_on_the_river_is_exact_against_one_hand():
     hole = [eq.card_int(DECK[51]), eq.card_int(DECK[47])]  # AS KS
     board = [eq.card_int(DECK[i]) for i in (43, 39, 35, 0, 1)]  # QS JS TS 2C 2D
     assert eq.equity(hole, board, 1.0, 500, rng) == 1.0
+
+
+class _FixedStats:
+    """Stands in for OpponentStats with a fixed fold_to_raise."""
+
+    def __init__(self, ftr):
+        self.ftr = ftr
+
+    def fold_to_raise(self, team):
+        return self.ftr
+
+
+@pytest.mark.parametrize("ftr, station, folder", [
+    (0.40, 0.0, 0.0),   # the prior: an unknown opponent gets v1's play
+    (0.05, 1.0, 0.0),   # calls everything
+    (0.25, 0.5, 0.0),
+    (0.55, 0.0, 0.5),
+    (0.85, 0.0, 1.0),   # folds to most bets
+])
+def test_profile_reads_stations_and_folders_from_fold_to_raise(ftr, station, folder):
+    from model import Model
+    m = Model()
+    m.opponents = _FixedStats(ftr)
+    s, f = m._profile("anyone")
+    assert s == pytest.approx(station)
+    assert f == pytest.approx(folder)
+
+
+def test_profile_at_the_real_prior_is_neutral():
+    from model import Model
+    assert Model()._profile("never seen") == (0.0, 0.0)

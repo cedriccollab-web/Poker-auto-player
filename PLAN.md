@@ -36,5 +36,11 @@ prefer-not-to-say`; the files to upload are copied to `upload/`.
 4. **Exploit** (strategy). After slice 2 merges, adjust play by the stats.
    Done when: evals against the sparring bots is better than v1 at 1000
    deals with intervals that do not overlap, or the change is dropped.
+   Status: v2 tested locally on windows-x64 (L1, L3): better than v1 with
+   non-overlapping intervals against tight (+59 vs +36) and example (+67 vs
+   +41), no opponent worse. v1 is frozen in `snapshots/v1/` as an opponent.
+   - Ruling: exploits key off fold_to_raise only (station and folder
+     degrees, both 0 at the prior) — unknown teams get exactly v1's play —
+     a team that folds preflop but calls postflop is misread.
 5. **Freeze at 17:15.** Only fixes after that. Final `python -m submit`
    and upload by 17:40.

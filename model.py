@@ -104,6 +104,15 @@ class Model:
             top *= narrow ** raises
         return max(0.04, top)
 
+    def _profile(self, team):
+        """How far the opponent leans calling station (0..1) or folder
+        (0..1), from fold_to_raise. Both are 0 at the prior (0.40), so an
+        unknown opponent gets exactly the v1 play."""
+        ftr = self.opponents.fold_to_raise(team)
+        station = min(1.0, max(0.0, (0.40 - ftr) / 0.30))
+        folder = min(1.0, max(0.0, (ftr - 0.40) / 0.30))
+        return station, folder
+
     def _raise(self, gs, total):
         me = self.player_id
         if not gs.can_raise:
@@ -127,18 +136,21 @@ class Model:
         call = PlayerAction.call(me)
         fold = PlayerAction.fold(me)
         opp_raises, pre_raiser = self._read_hand(opp)
+        station, folder = self._profile(team)
 
         if gs.street == "preflop":
             pct = PERCENTILE.get(self.cls, 1.0)
             if gs.current_bet <= bb:
                 if to_call > 0:  # the button, first in: open wide
-                    if pct <= 0.70:
-                        return self._raise(gs, 2.5 * bb)
+                    # Steal more from folders; raise only value into stations.
+                    if pct <= 0.70 + 0.30 * folder - 0.15 * station:
+                        size = 3.0 if station > 0.5 and pct <= 0.15 else 2.5
+                        return self._raise(gs, size * bb)
                     if pct <= 0.90:
                         return call
                     return fold
                 # Big blind after a limp.
-                if pct <= 0.40:
+                if pct <= 0.40 + 0.25 * folder - 0.10 * station:
                     return self._raise(gs, 3.5 * bb)
                 return call
             top = self._opp_range(gs, opp, team, opp_raises)
@@ -154,16 +166,18 @@ class Model:
         e = equity(self.hole, board, top, ITERS_POSTFLOP, _rng)
         pot = gs.pot
         if to_call == 0:
+            # Stations pay off: bet bigger and thinner for value.
             if e >= 0.72:
-                return self._raise(gs, 0.75 * pot)
-            if e >= 0.58:
-                return self._raise(gs, 0.5 * pot)
+                return self._raise(gs, (0.75 + 0.35 * station) * pot)
+            if e >= 0.58 - 0.08 * station:
+                return self._raise(gs, (0.5 + 0.2 * station) * pot)
+            # Folders give up: c-bet and bluff more; never bluff a station.
+            cbet = 0.6 + 0.3 * folder - 0.5 * station
             if (gs.street == "flop" and pre_raiser == me
-                    and _rng.random() < 0.6):
+                    and _rng.random() < cbet):
                 return self._raise(gs, 0.4 * pot)
-            if (gs.street == "river" and e < 0.2
-                    and self.opponents.fold_to_raise(team) > 0.5
-                    and _rng.random() < 0.3):
+            if (gs.street in ("turn", "river") and e < 0.3
+                    and _rng.random() < 0.45 * folder):
                 return self._raise(gs, 0.6 * pot)
             return call
         if e >= 0.80 and gs.can_raise:
