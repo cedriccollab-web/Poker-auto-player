@@ -11,3 +11,7 @@ site_out/
 /site-src/
 /tests/site_js/
 /event.json
+
+# Team submission builds (rebuilt by python -m submit), and the upload folder.
+/*.pkl
+/upload/

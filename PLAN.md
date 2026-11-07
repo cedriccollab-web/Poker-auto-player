@@ -1,7 +1,9 @@
 # Plan
 
 Deadline 18:00 on 2026-11-07; the form opens at 16:00. Uploader: **TBD
-(one person only)**. Team name: **TBD**.
+(one person only)**. Team name: **prefer-not-to-say** (names must be
+lower case: a-z, 0-9, `-`, `_`). Build: `python -m submit --team
+prefer-not-to-say`; the files to upload are copied to `upload/`.
 
 ## Slices
 

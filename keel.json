@@ -15,7 +15,7 @@
     "ui": null,
     "e2e": null,
     "build": null,
-    "package": null,
+    "package": "python -m submit --team prefer-not-to-say",
     "installers": null
   },
   "paths": {
