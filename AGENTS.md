@@ -50,6 +50,21 @@ Windows, `source .venv/bin/activate` elsewhere), so `python` is the venv's.
 6. `python -m pytest tests/test_model.py -q` and `python -m submit --team
    <team>` must both be clean before anything is uploaded.
 
+## Ownership (two people, two agents)
+
+- **strategy** (itsdanielyc, Claude Code): `model.py`, `equity.py`,
+  `tests/test_strategy.py`. Works on `main`; pushes only when
+  `tests/test_model.py` passes, so `main` is always submittable.
+- **opponents** (cedriccollab-web, Codex): `opponent.py`, `sparring.py`,
+  `tests/test_opponent.py`, `bots/`. Works on branch `opponents`; strategy
+  merges it into `main` after the bot check passes.
+- **shared**: `docs/handoff/`, `PLAN.md`, `AGENTS.md`, `keel.json`. The seam
+  between roles is `docs/handoff/opponent-stats.md`. A need outside your
+  files is a change to that document, not an edit to the other role's file.
+- Never edit the other role's files. `git pull --rebase` before every push.
+- One person uploads the submission (named in `PLAN.md`), never both: the
+  newest working upload is the one that plays.
+
 <!-- keel:start -->
 ## Keel
 

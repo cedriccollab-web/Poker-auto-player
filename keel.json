@@ -22,5 +22,10 @@
     "bot": "model.py",
     "contracts": ["card_utils.py", "player_action.py", "game_state.py", "game_interface.py"],
     "tests": "tests/"
+  },
+  "roles": {
+    "strategy": ["model.py", "equity.py", "tests/test_strategy.py"],
+    "opponents": ["opponent.py", "sparring.py", "tests/test_opponent.py", "bots/"],
+    "shared": ["docs/handoff/", "PLAN.md", "AGENTS.md", "keel.json"]
   }
 }

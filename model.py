@@ -1,5 +1,6 @@
 from card_utils import Card
 from game_state import GameStateView
+from opponent import OpponentStats
 from player_action import PlayerAction
 
 
@@ -16,6 +17,10 @@ class Model:
         # about other teams, by game_state.teams), here.
         self.hand = []
         self.player_id = None
+        # Learned across hands, per team (contract: docs/handoff/opponent-stats.md).
+        self.opponents = OpponentStats()
+        # Every action of the current hand, oldest first, for the tracker.
+        self.hand_actions = []
 
     def seed(self, hand: list[Card], player_id: int):
         """
@@ -25,6 +30,7 @@ class Model:
         """
         self.hand = hand
         self.player_id = player_id
+        self.hand_actions = []
 
     def run(
         self, actions: list[PlayerAction], game_state: GameStateView
@@ -39,6 +45,7 @@ class Model:
             game_state.call_amount, game_state.status(self.player_id),
             game_state.min_raise_to.
         """
+        self.hand_actions.extend(actions)
         return PlayerAction.call(self.player_id)
 
 
@@ -59,4 +66,9 @@ class Model:
         Learn from the hand here. Per-hand fields need no clearing: seed()
         sets them again at the start of the next hand.
         """
-        pass
+        self.hand_actions.extend(actions)
+        try:
+            self.opponents.update(self.hand_actions, game_state, self.player_id)
+        except Exception:
+            # A tracker bug must never fault the bot; it just learns less.
+            pass
