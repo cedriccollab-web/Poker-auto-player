@@ -48,5 +48,14 @@ prefer-not-to-say`; the files to upload are copied to `upload/`.
    - Ruling: accept v3's small, non-significant dips against shove-everything
      bots — real teams are likelier to shove tight than to shove everything —
      costs a few bb/100 against a true maniac.
+   - v4: after a postflop bet, the opponent's hand is weighted toward ones
+     with something on the board (pair using a hole card, flush draw); a
+     hand with nothing counts with weight 0.30 at prior aggression (0.10
+     passive, 0.90 maniac). Beats v3 head to head +24.8 ± 20.0; equity
+     bot +202 vs +145. The preflop-range narrowing per postflop raise is
+     removed so the two do not double count.
+   - Ruling: straight draws do not count as "something" — cheap to skip,
+     the flush draw covers most semi-bluffs — overfolds a little against a
+     bot that bets open-enders.
 5. **Freeze at 17:15.** Only fixes after that. Final `python -m submit`
    and upload by 17:40.

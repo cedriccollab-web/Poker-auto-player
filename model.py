@@ -91,7 +91,6 @@ class Model:
     def _opp_range(self, gs, opp, team, opp_raises):
         """The strongest fraction of hands the opponent is likely to hold."""
         vpip = self.opponents.vpip(team)
-        aggr = self.opponents.aggression(team)
         shove = self.opponents.shove_rate(team)
         if opp_raises[0] == 0:
             top = min(1.0, max(0.5, vpip + 0.25))
@@ -106,10 +105,18 @@ class Model:
                     top = min(1.0, max(0.12, shove))
                 else:
                     top = SHOVE_RANGE
-        narrow = 0.55 + 0.4 * aggr
-        for raises in opp_raises[1:]:
-            top *= narrow ** raises
+        # Postflop bets are read on the board instead (see _bluff_weight).
         return max(0.04, top)
+
+    def _bluff_weight(self, team, opp_raises):
+        """None if the opponent has not bet or raised after the flop this
+        hand; otherwise how much a hand with nothing on this board counts
+        against hands with something: 0.30 at the prior aggression, up to
+        0.90 for a maniac, down to 0.10 for a passive team."""
+        if not any(opp_raises[1:]):
+            return None
+        aggr = self.opponents.aggression(team)
+        return min(0.90, max(0.10, 0.30 + 1.5 * (aggr - 0.5)))
 
     def _profile(self, team):
         """How far the opponent leans calling station (0..1) or folder
@@ -170,7 +177,8 @@ class Model:
 
         board = [card_int(c) for c in gs.board]
         top = self._opp_range(gs, opp, team, opp_raises)
-        e = equity(self.hole, board, top, ITERS_POSTFLOP, _rng)
+        bluff = self._bluff_weight(team, opp_raises)
+        e = equity(self.hole, board, top, ITERS_POSTFLOP, _rng, bluff=bluff)
         pot = gs.pot
         if to_call == 0:
             # Stations pay off: bet bigger and thinner for value.

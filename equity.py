@@ -142,12 +142,30 @@ def range_combos(top):
     return combos
 
 
-def equity(hole, board, top, iters, rng):
+def has_something(hole, board):
+    """
+    Whether two hole cards make more of `board` (3 to 5 card ints) than the
+    board alone: a pair or better that uses a hole card, or, before the
+    river, four to a flush with at least one hole card.
+    """
+    if score7(list(hole) + list(board)) >> 20 > score7(board) >> 20:
+        return True
+    if len(board) < 5:
+        for s in range(4):
+            mine = (hole[0] & 3 == s) + (hole[1] & 3 == s)
+            if mine and mine + sum(1 for c in board if c & 3 == s) >= 4:
+                return True
+    return False
+
+
+def equity(hole, board, top, iters, rng, bluff=None):
     """
     Share of the pot won by `hole` (two card ints) on `board` (0 to 5 card
     ints) against one opponent holding a hand from the strongest `top`
     fraction of starting hands, over `iters` random run-outs. Ties count
-    half.
+    half. With `bluff` (0..1) after the flop, the opponent's hand is one
+    that has something on this board (has_something), or nothing with
+    relative weight `bluff`: use it when the opponent has bet.
     """
     dead = set(hole) | set(board)
     combos = [c for c in range_combos(top) if c[0] not in dead and c[1] not in dead]
@@ -155,10 +173,24 @@ def equity(hole, board, top, iters, rng):
         combos = [c for c in range_combos(1.0) if c[0] not in dead and c[1] not in dead]
     deck = [c for c in range(52) if c not in dead]
     need = 5 - len(board)
-    n = len(combos)
+    # After a postflop bet: hands with something count fully, the rest
+    # only with weight `bluff` (how often this opponent bets with nothing).
+    strong, weak = combos, []
+    if bluff is not None and len(board) >= 3 and bluff < 1.0:
+        strong = [c for c in combos if has_something(c, board)]
+        weak = [c for c in combos if not has_something(c, board)]
+        if not strong:
+            strong, weak = combos, []
+    ns, nw = len(strong), len(weak)
+    w = max(0.0, bluff or 0.0) if nw else 0.0
+    total = ns + w * nw
     won = 0.0
     for _ in range(iters):
-        o1, o2 = combos[int(rng.random() * n)]
+        r = rng.random() * total
+        if r < ns:
+            o1, o2 = strong[int(r)]
+        else:
+            o1, o2 = weak[min(nw - 1, int((r - ns) / w))]
         if need:
             drawn = rng.sample(deck, need + 2)
             run = [c for c in drawn if c != o1 and c != o2][:need]

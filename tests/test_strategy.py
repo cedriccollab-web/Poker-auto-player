@@ -188,3 +188,30 @@ def test_a_preflop_shove_is_read_as_the_teams_shove_rate(shove, hands, expected)
     m.opponents = _ShoveStats(shove, hands)
     top = m._opp_range(_AllInPreflop(), 1, "them", [1, 0, 0, 0])
     assert top == pytest.approx(model.SHOVE_RANGE if expected is None else expected)
+
+
+def _ints(text):
+    from card_utils import Card
+    return [eq.card_int(Card.parse(t)) for t in text.split()]
+
+
+@pytest.mark.parametrize("hole, board, expected", [
+    ("7H 6H", "KS 7D 2C", True),         # pair using a hole card
+    ("QH JD", "KS 7D 2C", False),        # nothing
+    ("AH 3H", "KH 7H 2C", True),         # flush draw with a hole card
+    ("AH 3H", "KH 7H 2C 9S 4D", False),  # the draw missed on the river
+    ("QH JD", "KS KD 2C", False),        # only the board's pair
+    ("2H 2D", "KS KD 9C", True),         # two pair with a pocket pair
+])
+def test_has_something_after_the_flop(hole, board, expected):
+    assert eq.has_something(_ints(hole), _ints(board)) is expected
+
+
+def test_equity_against_a_postflop_bet_counts_mostly_made_hands():
+    rng = random.Random(5)
+    hole, board = _ints("AH 5C"), _ints("KS 7D 2C 9S 4H")  # ace high on the river
+    plain = eq.equity(hole, board, 1.0, 3000, rng)
+    honest = eq.equity(hole, board, 1.0, 3000, rng, bluff=0.1)
+    anything = eq.equity(hole, board, 1.0, 3000, rng, bluff=1.0)
+    assert honest < plain - 0.15
+    assert anything == pytest.approx(plain, abs=0.04)
