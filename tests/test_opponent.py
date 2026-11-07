@@ -121,3 +121,17 @@ def test_sparring_pickles_play_without_faults(name):
     from evals.score import score
     measured = score([result])
     assert measured.faults == [0, 0] or measured.faults == (0, 0)
+
+
+@pytest.mark.parametrize('name', ['pushfold', 'nit', 'potbettor', 'minraiser', 'sharp'])
+def test_hard_sparring_pickles_play_legally(name):
+    from arena.match import MatchConfig, play_match
+    from arena.players import player
+    from evals.score import score
+    # Both normal and short stacks exercise raise caps and all-in calls.
+    for stack in (500, 60):
+        result = score([play_match(
+            [player('bots/' + name + '.pkl'), player('random')],
+            MatchConfig(deals=10, seed=79, stack=stack),
+        )])
+        assert tuple(result.faults) == (0, 0), result.first_faults

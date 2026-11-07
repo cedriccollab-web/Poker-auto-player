@@ -45,3 +45,12 @@ Platform: macOS arm64, .venv Python 3.14; Windows not run.
 - `python -m evals --deals 1000 --opponents tight equity shove random call bots/example.pkl bots/maniac.pkl bots/station.pkl`: 2000 hands per opponent, zero faults. Three behind and five unclear.
 - origin/main still at `31a258b`; strategy v1 absent. Measured `9050744` (calling template plus opponent tracker). No strategy edits.
 - Complete outputs and intervals: [measurement report](docs/handoff/evals-v1.md).
+
+## 2026-11-07 — harder sparring, 2026-11-07 14:52:52 GMT to 2026-11-07 14:58:03 GMT
+
+Platform: macOS arm64, Python 3.14.0 (.venv). Base strategy: `9fb3d7a`.
+
+- L3 red/green: five new pickle-legality cases failed before the pickles existed (5 failed in 0.80s), then passed with the real artifacts; normal/short stacks, both seats fault-free.
+- Focused L1/L3: `python -m pytest tests/test_model.py tests/test_opponent.py -q`: 30 passed in 9.96s.
+- `python -m evals --deals 1000 --opponents bots/pushfold.pkl bots/nit.pkl bots/potbettor.pkl bots/minraiser.pkl bots/sharp.pkl bots/example.pkl`: 2000 hands per opponent. V1 bb/100 ± 95% half-width: pushfold +1.8 ± 23.6 (unclear, flagged); nit +50.2 ± 9.6, potbettor +32.8 ± 15.9, minraiser +351.1 ± 35.9, sharp +128.1 ± 25.3, example +40.6 ± 10.1 (all five ahead). Zero v1 faults.
+- No strategy files or opponent interface changed. Full outputs, intervals and bot definitions: [hard sparring report](docs/handoff/evals-v1-hard.md).
