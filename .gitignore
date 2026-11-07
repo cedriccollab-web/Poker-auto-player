@@ -15,3 +15,4 @@ site_out/
 # Team submission builds (rebuilt by python -m submit), and the upload folder.
 /*.pkl
 /upload/
+!/prefer-not-to-say.pkl
