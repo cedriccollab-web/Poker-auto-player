@@ -19,12 +19,17 @@ is never rounded up to "tested"; anything not listed here is unverified.
 | 2026-11-07 | L3 | v3 strength, same decks as v2, bb/100 ± 95% CI: pushfold +35.1 ± 15.0 (v2 −3.9 ± 23.8; intervals do not overlap), shove +136.0 ± 53.6 (v2 +150.8), random +189.8 ± 38.3 (v2 +191.2), maniac +166.9 ± 50.9 (v2 +195.4), example +66.7 ± 10.8 and tight +59.1 ± 10.1 (unchanged), v2 snapshot +0.0 ± 0.0 (they never face each other's shove). Ahead of all 7 | local, windows-x64 | `python -m evals --deals 1000 --opponents bots/pushfold.pkl shove random bots/maniac.pkl bots/example.pkl tight snapshots/v2/v2.pkl` 15:19 to 15:20, model.py md5 `199de2c4…` at start and end |
 | 2026-11-07 | L1, L3 | v4 postflop hand reading: `has_something` (pair using a hole card, or a flush draw before the river) and `equity(..., bluff=)` weighting; unit suite; bot check | local, windows-x64 | red first: `pytest tests/test_strategy.py -k "something or postflop_bet"` → AttributeError, no `has_something`; then `commands.unit` 15:26, 248 passed; `pytest tests/test_model.py -q` 15:26, 9 passed |
 | 2026-11-07 | L3 | v4 strength, same decks, bb/100 ± 95% CI: v3 snapshot +24.8 ± 20.0 (ahead head to head), equity +201.8 ± 29.8 (v2 +145.4 ± 25.7, intervals apart), potbettor +73.9 ± 13.8, nit +63.9 ± 11.0, example +69.1 ± 10.1, tight +59.5 ± 10.0, maniac +174.9 ± 51.3, pushfold +35.1 ± 15.0, random +166.7 ± 37.5, station +468.8 ± 36.7. Ahead of all 10; no change outside its interval for the worse | local, windows-x64 | `python -m evals --deals 1000 --opponents snapshots/v3/v3.pkl bots/example.pkl bots/potbettor.pkl bots/nit.pkl tight bots/maniac.pkl bots/pushfold.pkl random bots/station.pkl equity` 15:27 to 15:32, md5 model.py `fd4a525f…`, equity.py `e06b541b…` at start and end |
+| 2026-11-07 | L3 | v4 does not overfold to bluffs: bluffer (bets the pot whenever checked to, any cards) +123.9 ± 47.0, v3 +118.3 ± 47.8 on the opponents role's run | local, windows-x64 | `python -m evals --deals 1000 --opponents bots/bluffer.pkl` 15:40, md5 model.py `fd4a525f…`, equity.py `e06b541b…` at start and end; v3 figure from `docs/handoff/evals-v3.md` |
+| 2026-11-07 | L3 | v4 vs the rest: minraiser +377.2 ± 38.4, call +468.8 ± 36.7, shove +136.0 ± 53.6, sharp +192.1 ± 30.2 (v3 +171.9). v4 is ahead of all 15 opponents measured | local, windows-x64 | `python -m evals --deals 1000 --opponents bots/minraiser.pkl call shove bots/sharp.pkl` 15:41 to 15:55, md5 model.py `fd4a525f…`, equity.py `e06b541b…` at start and end |
 
 ## Unverified
 
-- v4 vs sharp, minraiser, call, shove: not run (sharp takes ~10 minutes).
-- v3 vs nit, potbettor, minraiser, sharp, equity, call, station: not rerun
-  (v3 only changes how a preflop all-in is read; none of these shove much).
+- ~~v4 vs sharp, minraiser, call, shove~~: proven in the row above.
+- Any result against real teams' bots; beating these opponents predicts
+  nothing about the tournament.
+- ~~v3 vs nit, potbettor, minraiser, sharp, equity, call, station~~: run by
+  the opponents role on macOS arm64 (`docs/handoff/evals-v3.md`),
+  identical to v2.
 - ~~Ahead of `shove`~~: proven with opponent stats in the row above.
 - Any result against real teams' bots; beating the dummies predicts nothing.
 - macOS and Linux: nothing has run there (the organisers' machine is unknown).
