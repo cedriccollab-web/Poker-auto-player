@@ -60,3 +60,13 @@ Platform: macOS arm64, Python 3.14.0 (.venv). Base strategy: `9fb3d7a`.
 - Focused L1/L3: `python -m pytest tests/test_model.py tests/test_opponent.py -q`: 30 passed in 9.96s.
 - `python -m evals --deals 1000 --opponents bots/pushfold.pkl bots/nit.pkl bots/potbettor.pkl bots/minraiser.pkl bots/sharp.pkl bots/example.pkl`: 2000 hands per opponent. V1 bb/100 ± 95% half-width: pushfold +1.8 ± 23.6 (unclear, flagged); nit +50.2 ± 9.6, potbettor +32.8 ± 15.9, minraiser +351.1 ± 35.9, sharp +128.1 ± 25.3, example +40.6 ± 10.1 (all five ahead). Zero v1 faults.
 - No strategy files or opponent interface changed. Full outputs, intervals and bot definitions: [hard sparring report](docs/handoff/evals-v1-hard.md).
+
+## 2026-11-07 — v3 regression and bluffer (opponents role)
+
+Platform: macOS arm64, Python 3.14.0 (.venv); strategy `bcdd1f0`.
+
+- Focused L1/L3: `python -m pytest tests/test_model.py tests/test_opponent.py -q`: 30 passed in 9.56s before regression; 31 passed in 10.28s after bluffer. Bluffer test red first (missing class, 1 failed in 0.06s), then green, including worker pickle legality at normal and short stacks.
+- Regression: `python -m evals --deals 1000 --opponents bots/nit.pkl bots/potbettor.pkl bots/minraiser.pkl bots/sharp.pkl equity call bots/station.pkl snapshots/v2/v2.pkl`, 2026-11-07 15:27:52 GMT to 2026-11-07 15:34:16 GMT. Means/95% half-widths: nit +65.9 ± 10.5, potbettor +67.4 ± 14.7, minraiser +378.1 ± 38.8, sharp +171.9 ± 27.0, equity +145.4 ± 25.7, call +468.8 ± 36.7, station +468.8 ± 36.7 (all ahead, all identical to v2); v2 snapshot 0.0 ± 0.0 (unclear, flagged).
+- `python -m evals --deals 1000 --opponents bots/bluffer.pkl`, 2026-11-07 15:35:02 GMT to 2026-11-07 15:35:05 GMT: +118.3 ± 47.8 bb/100, ahead. No v2 bluffer baseline exists in the ledger.
+- All matchups 2000 hands, zero v3 faults. `md5 model.py` at start/end of both runs: `199de2c4ecc497ad6d673e7800f7afff`. No files changed or pulls during evaluation. Strategy files and opponent interface unchanged.
+- Full output, intervals and v2 comparisons: [v3 measurements](docs/handoff/evals-v3.md).

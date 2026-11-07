@@ -135,3 +135,39 @@ def test_hard_sparring_pickles_play_legally(name):
             MatchConfig(deals=10, seed=79, stack=stack),
         )])
         assert tuple(result.faults) == (0, 0), result.first_faults
+
+
+def test_bluffer_pickle_plays_legally():
+    from sparring import Bluffer
+    from arena.match import MatchConfig, play_match
+    from arena.players import player
+    from evals.score import score
+
+    # The cap is the opponent's total raise-to amount, not the call increment.
+    bot = Bluffer()
+    bot.seed([Card.parse('2C'), Card.parse('3D')], 0)
+    gs = SimpleNamespace(street='preflop', call_amount=50, current_bet=60,
+                         big_blind=20, bets=(10, 60), can_raise=True,
+                         raise_range=(100, 500), pot=70)
+    assert bot.run([], gs).kind == 'call'
+    gs.current_bet = 61
+    assert bot.run([], gs).kind == 'fold'
+    gs.call_amount = 0
+    assert bot.run([], gs).kind == 'call'
+    # A pot bluff with the same weak cards on every postflop street.
+    for street in ('flop', 'turn', 'river'):
+        gs.street, gs.pot, gs.bets = street, 80, (0, 0)
+        gs.raise_range = (20, 500)
+        action = bot.run([], gs)
+        assert action.kind == 'raise' and action.amount == 80
+        gs.call_amount = 20
+        assert bot.run([], gs).kind == 'fold'
+        gs.call_amount = 0
+    gs.can_raise = False
+    assert bot.run([], gs).kind == 'call'
+    for stack in (500, 60):
+        measured = score([play_match(
+            [player('bots/bluffer.pkl'), player('random')],
+            MatchConfig(deals=20, seed=103, stack=stack),
+        )])
+        assert tuple(measured.faults) == (0, 0), measured.first_faults

@@ -133,3 +133,18 @@ class Sharp(EquityBot):
         action = worker.run(actions, game_state)
         self.random_state = worker.rng.getstate()
         return action
+
+
+class Bluffer(CallingStation):
+    """See cheap flops, then pot-bluff with any cards and fold to aggression."""
+    def run(self, actions, game_state):
+        if game_state.street == 'preflop':
+            if (game_state.call_amount == 0
+                    or game_state.current_bet <= 3 * game_state.big_blind):
+                return PlayerAction.call(self.player_id)
+            return PlayerAction.fold(self.player_id)
+        if game_state.call_amount > 0:
+            return PlayerAction.fold(self.player_id)
+        return self._raise(
+            game_state, game_state.bets[self.player_id] + game_state.pot,
+        )
