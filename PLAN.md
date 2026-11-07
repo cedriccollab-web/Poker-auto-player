@@ -3,7 +3,9 @@
 Deadline 18:00 on 2026-11-07; the form opens at 16:00. Uploader: **TBD
 (one person only)**. Team name: **Prefer not to say** (pickle name `prefer-not-to-say`: names
 must be lower case: a-z, 0-9, `-`, `_`). The form takes the GitHub repo
-link, so `main` is the submission; see `SUBMISSION.md`. Build: `python -m submit --team
+link, so `main` is the submission; see `SUBMISSION.md`. The bot is two
+files: `prefer-not-to-say.pkl` and a generated, self-contained `model.py`
+(`python tools/bundle_model.py`), because the form names only those two. Build: `python -m submit --team
 prefer-not-to-say`; the files to upload are copied to `upload/`.
 
 ## Slices

@@ -25,7 +25,12 @@ Windows, `source .venv/bin/activate` elsewhere), so `python` is the venv's.
 
 ## Layout
 
-- `model.py`: the bot. The one file we write; helper modules go flat next to it.
+- `model.py`: the submitted bot, **generated** as one self-contained file
+  (the form takes the `.pkl` and `model.py` only). Never edit it: edit
+  `strategy.py` (decisions), `equity.py`, `opponent.py` or `preflop_table.py`,
+  then run `python tools/bundle_model.py` and rebuild the pickle with
+  `python -m submit --team prefer-not-to-say`. `tests/test_bundle.py` fails
+  when `model.py` is stale. `SUBMISSION.md` says what the organisers take.
 - `card_utils.py`, `player_action.py`, `game_state.py`, `game_interface.py`:
   the organisers' public contract, headed `DO NOT CHANGE THIS CODE`.
 - `engine.py`: plays one hand. `arena/`: matches, worker processes, vetting,
@@ -35,8 +40,9 @@ Windows, `source .venv/bin/activate` elsewhere), so `python` is the venv's.
 
 ## Rules that are not negotiable
 
-1. Edit only `model.py` and new flat files next to it. Never edit the
-   contract files or the engine: the organisers' copies are what play.
+1. Edit only the bot's sources (`strategy.py`, `equity.py`, `opponent.py`,
+   `preflop_table.py`) and regenerate `model.py`. Never edit the contract
+   files or the engine: the organisers' copies are what play.
 2. The model is pickled: plain-data attributes only (numbers, lists, dicts,
    numpy arrays, weights). No lambdas, files, sockets, threads, generators.
    Weights and data load in `__init__`; nothing on disk exists at play time.

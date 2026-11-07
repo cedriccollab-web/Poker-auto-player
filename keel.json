@@ -24,7 +24,7 @@
     "tests": "tests/"
   },
   "roles": {
-    "strategy": ["model.py", "equity.py", "preflop_table.py", "tests/test_strategy.py"],
+    "strategy": ["strategy.py", "model.py", "equity.py", "preflop_table.py", "tools/", "prefer-not-to-say.pkl", "tests/test_strategy.py", "tests/test_bundle.py"],
     "opponents": ["opponent.py", "sparring.py", "tests/test_opponent.py", "bots/"],
     "shared": ["docs/handoff/", "PLAN.md", "AGENTS.md", "keel.json"]
   }
