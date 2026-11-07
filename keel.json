@@ -1,0 +1,26 @@
+{
+  "keel": 1,
+  "name": "pokerbot",
+  "profile": "python-bot",
+  "platforms": {
+    "tier1": ["windows-x64"],
+    "tier2": null,
+    "tier3": null
+  },
+  "commands": {
+    "lint": null,
+    "unit": "python -m pytest -q --ignore=tests/test_model.py --ignore=tests/arena_tests",
+    "contracts": null,
+    "integration": "python -m pytest tests/test_model.py tests/arena_tests -q",
+    "ui": null,
+    "e2e": null,
+    "build": null,
+    "package": null,
+    "installers": null
+  },
+  "paths": {
+    "bot": "model.py",
+    "contracts": ["card_utils.py", "player_action.py", "game_state.py", "game_interface.py"],
+    "tests": "tests/"
+  }
+}

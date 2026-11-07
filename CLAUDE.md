@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # Poker bot arena
 
 No-limit Texas hold'em for bots. A team writes a `Model` in `model.py`; the
