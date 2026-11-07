@@ -42,5 +42,11 @@ prefer-not-to-say`; the files to upload are copied to `upload/`.
    - Ruling: exploits key off fold_to_raise only (station and folder
      degrees, both 0 at the prior) — unknown teams get exactly v1's play —
      a team that folds preflop but calls postflop is misread.
+   - v3: a preflop shove is read as the team's own shove rate (floor 12%)
+     after 20 hands. pushfold +35.1 (v2 −3.9), intervals apart; shove and
+     maniac slightly lower within noise.
+   - Ruling: accept v3's small, non-significant dips against shove-everything
+     bots — real teams are likelier to shove tight than to shove everything —
+     costs a few bb/100 against a true maniac.
 5. **Freeze at 17:15.** Only fixes after that. Final `python -m submit`
    and upload by 17:40.

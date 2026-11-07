@@ -22,8 +22,10 @@ _rng = random.Random(20261107)
 
 ITERS_PREFLOP = 300
 ITERS_POSTFLOP = 300
-# A preflop all-in is read as at least this strongest fraction of hands.
+# A preflop all-in is read as this strongest fraction of hands until the
+# opponent's own shove rate has SHOVE_MIN_HANDS hands behind it.
 SHOVE_RANGE = 0.50
+SHOVE_MIN_HANDS = 20
 
 
 class Model:
@@ -97,8 +99,13 @@ class Model:
             top = min(1.0, max(0.15, vpip * 0.6))
             top *= 0.55 ** (opp_raises[0] - 1)
             if gs.street == "preflop" and gs.status(opp) == "all_in":
-                # Do not over-fold to shoves: bots that shove a lot are wide.
-                top = min(1.0, max(SHOVE_RANGE, shove * 3, top))
+                # A team that shoves X% of its preflop decisions shoves
+                # about its top X%. Until enough hands are seen, read a
+                # shove as SHOVE_RANGE so shove-happy bots are not over-folded.
+                if self.opponents.hands_seen(team) >= SHOVE_MIN_HANDS:
+                    top = min(1.0, max(0.12, shove))
+                else:
+                    top = SHOVE_RANGE
         narrow = 0.55 + 0.4 * aggr
         for raises in opp_raises[1:]:
             top *= narrow ** raises

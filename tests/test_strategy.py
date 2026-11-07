@@ -145,3 +145,46 @@ def test_profile_reads_stations_and_folders_from_fold_to_raise(ftr, station, fol
 def test_profile_at_the_real_prior_is_neutral():
     from model import Model
     assert Model()._profile("never seen") == (0.0, 0.0)
+
+
+class _ShoveStats:
+    """Fixed opponent stats for reading a preflop shove."""
+
+    def __init__(self, shove, hands):
+        self.shove, self.hands = shove, hands
+
+    def vpip(self, team):
+        return 0.6
+
+    def aggression(self, team):
+        return 0.5
+
+    def shove_rate(self, team):
+        return self.shove
+
+    def hands_seen(self, team):
+        return self.hands
+
+    def fold_to_raise(self, team):
+        return 0.4
+
+
+class _AllInPreflop:
+    street = "preflop"
+
+    def status(self, seat):
+        return "all_in"
+
+
+@pytest.mark.parametrize("shove, hands, expected", [
+    (0.29, 50, 0.29),   # a tight shover is read as its own shove rate
+    (0.95, 50, 0.95),   # a bot that shoves everything is wide
+    (0.02, 50, 0.12),   # never read narrower than the top 12%
+    (0.29, 5, None),    # too few hands seen: the default SHOVE_RANGE
+])
+def test_a_preflop_shove_is_read_as_the_teams_shove_rate(shove, hands, expected):
+    import model
+    m = model.Model()
+    m.opponents = _ShoveStats(shove, hands)
+    top = m._opp_range(_AllInPreflop(), 1, "them", [1, 0, 0, 0])
+    assert top == pytest.approx(model.SHOVE_RANGE if expected is None else expected)
