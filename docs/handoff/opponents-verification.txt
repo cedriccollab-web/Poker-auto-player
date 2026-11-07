@@ -1,0 +1,63 @@
+Opponents verification, 2026-11-07
+Platform: macOS-26.2-arm64-arm-64bit-Mach-O; Python 3.14 in .venv (macOS arm64).
+Windows was not run.
+
+L1 mutation checks: temporary count/prior/guard changes; each failed, restored, and recompiled to avoid stale bytecode.
+prior: 4 failed in 0.05s
+hands: 1 failed in 0.04s
+fold: 1 failed in 0.04s
+aggression: 1 failed in 0.04s
+vpip: 1 failed in 0.04s
+shove: 1 failed in 0.04s
+street: 1 failed in 0.04s
+pickle: 1 failed in 0.04s
+guard: 1 failed in 0.04s
+engine: 1 failed in 0.04s
+
+L1 full command: .venv/bin/python -m pytest -q --ignore=tests/test_model.py --ignore=tests/arena_tests
+........................................................................ [ 34%]
+........................................................................ [ 68%]
+.................................................................        [100%]
+209 passed in 1.81s
+
+L3 full command: .venv/bin/python -m pytest tests/test_model.py tests/arena_tests -q
+........................................................................ [ 32%]
+.s...ss............s.s...........................................s...... [ 64%]
+........................................................................ [ 96%]
+.........                                                                [100%]
+219 passed, 6 skipped in 48.69s
+
+Strength command: .venv/bin/python -m evals --opponents bots/example.pkl bots/station.pkl bots/maniac.pkl --deals 1000
+opponents                       your bb/100  verdict   hands faults  slowest
+example                     -105.2 ± 24.1     behind    2000      0    0.00s
+station                       +0.0 ± 0.0     unclear    2000      0    0.00s
+maniac                        +0.0 ± 0.0     unclear    2000      0    0.00s
+
+Strength command: .venv/bin/python -m evals --opponents tight equity --deals 1000
+opponents                       your bb/100  verdict   hands faults  slowest
+tight                        -94.7 ± 24.1     behind    2000      0    0.00s
+equity                      -253.7 ± 27.9     behind    2000      0    0.00s
+
+Packaging command: .venv/bin/python -m submit --team opponents_check
+Wrote ./opponents_check.pkl
+
+Playing your model against dummy bots...
+OK: played legally against every dummy.
+
+Upload these files in the form (all of them):
+  opponents_check.pkl
+  model.py
+  opponent.py
+
+Focused final command: .venv/bin/python -m pytest tests/test_opponent.py tests/test_model.py -q
+25 passed in 2.95s.
+
+Sparring seed mutation: all three parametrized pickle tests failed; restored.
+Queries (100000 calls each, timeit): hands_seen 0.034 microseconds;
+fold_to_raise 0.101; aggression 0.103; vpip 0.100; shove_rate 0.104.
+All comfortably below 1 ms locally.
+
+The strategy in this checkout is unchanged and still calls every hand.
+The benchmarks report its baseline, not a stronger strategy claim.
+Engine and scoring files were not modified. The generated packaging-check
+pickle was moved to /private/tmp/opponents_check.pkl, not submitted.
